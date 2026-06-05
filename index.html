@@ -188,7 +188,7 @@ var LINES  = {"type": "FeatureCollection", "features": [{"id": "0", "type": "Fea
 
 var state = {};
 POINTS.forEach(function(p){ state[p.idx]={lat:p.lat,lng:p.lng,deleted:false,moved:false}; });
-var history = [];
+var undoStack = [];
 var selected = new Set();
 var activeIdx = null;
 var filteredIdxs = new Set(POINTS.map(function(p){return p.idx;}));
@@ -299,7 +299,7 @@ function buildMarkers(idxSet){
     });
     m.on('dragend',function(e){
       var prev=dragGroup.map(function(i){return {idx:i,lat:dragOrig[i].lat,lng:dragOrig[i].lng};});
-      history.push({type:'move',prev:prev});
+      undoStack.push({type:'move',prev:prev});
       dragGroup.forEach(function(i){ state[i].moved=true; refreshMarker(i); });
       if(selected.size>0)renderMulti(); else if(activeIdx===p.idx)renderDetail(p.idx);
       updateStats();
@@ -518,7 +518,7 @@ function clearSelection(refresh){
 // ── DELETE ────────────────────────────────────────────────
 function toggleDeleteMulti(idxs){
   var allDel=idxs.every(function(i){return state[i].deleted;});
-  history.push({type:'delete',idxs:idxs.slice(),prev:idxs.map(function(i){return state[i].deleted;})});
+  undoStack.push({type:'delete',idxs:idxs.slice(),prev:idxs.map(function(i){return state[i].deleted;})});
   idxs.forEach(function(i){ state[i].deleted=!allDel; if(!allDel)state[i].moved=false; refreshMarker(i); });
   showToast(idxs.length+' titik '+(allDel?'dipulihkan':'dihapus'));
   if(selected.size>0)renderMulti(); else if(activeIdx!==null)renderDetail(activeIdx);
@@ -578,13 +578,13 @@ function mToLng(m,lat){return m/(111320*Math.cos(lat*Math.PI/180));}
 function getStep(){var el=document.getElementById('nudge-step');return el?parseFloat(el.value)||1:1;}
 function nudgeOne(idx,dirLat,dirLng){
   var step=getStep(),s=state[idx];
-  history.push({type:'move',prev:[{idx:idx,lat:s.lat,lng:s.lng}]});
+  undoStack.push({type:'move',prev:[{idx:idx,lat:s.lat,lng:s.lng}]});
   s.lat+=mToLat(step)*dirLat; s.lng+=mToLng(step,s.lat)*dirLng; s.moved=true;
   refreshMarker(idx); renderDetail(idx); updateStats();
 }
 function nudgeSel(dirLat,dirLng){
   var step=getStep(),arr=Array.from(selected);
-  history.push({type:'move',prev:arr.map(function(i){return {idx:i,lat:state[i].lat,lng:state[i].lng};})});
+  undoStack.push({type:'move',prev:arr.map(function(i){return {idx:i,lat:state[i].lat,lng:state[i].lng};})});
   arr.forEach(function(i){var s=state[i];s.lat+=mToLat(step)*dirLat;s.lng+=mToLng(step,s.lat)*dirLng;s.moved=true;refreshMarker(i);});
   updateStats();
 }
@@ -624,13 +624,13 @@ function updateStats(){
   document.getElementById('ep-badge').textContent=aktif+' aktif';
   var b=document.getElementById('sb-changed'),n=del+moved;
   if(n>0){b.style.display='inline';b.textContent=n+' perubahan';}else b.style.display='none';
-  document.getElementById('btn-undo').disabled=history.length===0;
+  document.getElementById('btn-undo').disabled=undoStack.length===0;
 }
 
 // ── UNDO ──────────────────────────────────────────────────
 function undoLast(){
-  if(!history.length)return;
-  var h=history.pop();
+  if(!undoStack.length)return;
+  var h=undoStack.pop();
   if(h.type==='delete')h.idxs.forEach(function(i,k){state[i].deleted=h.prev[k];refreshMarker(i);});
   else if(h.type==='move')h.prev.forEach(function(pp){
     state[pp.idx].lat=pp.lat;state[pp.idx].lng=pp.lng;

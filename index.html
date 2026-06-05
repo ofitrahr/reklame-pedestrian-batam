@@ -257,9 +257,12 @@ function makeIcon(col,sz,ring,deleted){
 var markers={};
 function buildMarkers(idxSet){
   layerPoints.clearLayers(); markers={};
+  var showDeleted=(document.getElementById('f-status').value==='deleted');
   POINTS.forEach(function(p){
     if(!idxSet.has(p.idx))return;
-    var s=state[p.idx],col=ptColor(p),isSel=selected.has(p.idx);
+    var s=state[p.idx];
+    if(s.deleted && !showDeleted)return; // titik dihapus → tidak tampil di peta
+    var col=ptColor(p),isSel=selected.has(p.idx);
     var m=L.marker([s.lat,s.lng],{
       icon:makeIcon(col,isSel?12:9,isSel,s.deleted),
       draggable:!s.deleted && mode==='nav',
@@ -312,8 +315,18 @@ function buildMarkers(idxSet){
 var dragStart=null,dragGroup=[],dragOrig={};
 
 function refreshMarker(idx){
-  var p=POINTS.find(function(x){return x.idx===idx;}); if(!p||!markers[idx])return;
+  var p=POINTS.find(function(x){return x.idx===idx;}); if(!p)return;
   var s=state[idx],isSel=selected.has(idx);
+  var showDeleted=(document.getElementById('f-status').value==='deleted');
+  if(s.deleted && !showDeleted){
+    // Hapus marker dari peta jika titik dihapus dan filter bukan "deleted"
+    if(markers[idx]){ layerPoints.removeLayer(markers[idx]); delete markers[idx]; }
+    return;
+  }
+  if(!markers[idx]){
+    // Titik dipulihkan atau filter deleted aktif: buat ulang marker
+    buildMarkers(filteredIdxs); return;
+  }
   markers[idx].setIcon(makeIcon(ptColor(p),isSel?12:9,isSel,s.deleted));
   markers[idx].setLatLng([s.lat,s.lng]);
   markers[idx].options.draggable=!s.deleted&&mode==='nav';
@@ -521,7 +534,12 @@ function toggleDeleteMulti(idxs){
   undoStack.push({type:'delete',idxs:idxs.slice(),prev:idxs.map(function(i){return state[i].deleted;})});
   idxs.forEach(function(i){ state[i].deleted=!allDel; if(!allDel)state[i].moved=false; refreshMarker(i); });
   showToast(idxs.length+' titik '+(allDel?'dipulihkan':'dihapus'));
-  if(selected.size>0)renderMulti(); else if(activeIdx!==null)renderDetail(activeIdx);
+  if(!allDel){
+    selected.clear(); activeIdx=null;
+    renderEmpty();
+  } else {
+    if(selected.size>0)renderMulti(); else if(activeIdx!==null)renderDetail(activeIdx);
+  }
   updateStats();
 }
 

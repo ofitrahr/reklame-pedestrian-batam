@@ -377,15 +377,20 @@ map.getContainer().addEventListener('mouseup',function(e){
     var s=state[p.idx];
     if(b.contains([s.lat,s.lng])){selected.add(p.idx);added++;}
   });
-  buildMarkers(filteredIdxs);
-  if(selected.size>0)renderMulti();
-  showToast(added+' titik terpilih');
+  // Auto-switch ke Navigasi supaya bisa langsung geser titik terpilih
+  if(selected.size>0){
+    setMode('nav');
+    renderMulti();
+    showToast(added+' titik terpilih · drag untuk geser');
+  } else {
+    buildMarkers(filteredIdxs);
+  }
 });
 
 // ── RULER ─────────────────────────────────────────────────
-var rulerPts=[],rulerLine=null,rulerCircle=null;
+var rulerPts=[],rulerLine=null,rulerCircle=null,rulerFinished=false;
 function setRuler(m){
-  clearRuler(); rulerMode=m;
+  clearRuler(); rulerMode=m; rulerFinished=false;
   document.getElementById('r-line').classList.toggle('active',m==='line');
   document.getElementById('r-radius').classList.toggle('active',m==='radius');
   map.getContainer().style.cursor='crosshair';
@@ -394,17 +399,24 @@ function setRuler(m){
   showRuler(m,0,0);
 }
 function clearRuler(){
-  rulerMode=null; rulerPts=[];
+  rulerMode=null; rulerPts=[]; rulerFinished=false;
   layerRuler.clearLayers(); rulerLine=null; rulerCircle=null;
   map.off('click',rulerClick); map.off('mousemove',rulerMove);
   document.getElementById('r-line').classList.remove('active');
   document.getElementById('r-radius').classList.remove('active');
   if(mode==='nav'){map.dragging.enable();map.getContainer().style.cursor='';}
-  else map.getContainer().style.cursor='crosshair';
+  else {map.dragging.disable();map.getContainer().style.cursor='crosshair';}
   var rp=document.getElementById('ruler-panel'); if(rp)rp.remove();
 }
 function rulerClick(e){
+  if(rulerFinished)return; // sudah dikunci, abaikan klik sampai reset
   if(rulerMode==='line'){
+    // Double-click (klik di titik yang sama / sangat dekat titik terakhir) = finish
+    if(rulerPts.length>=1){
+      var lastP=rulerPts[rulerPts.length-1];
+      var cp1=map.latLngToContainerPoint(lastP), cp2=map.latLngToContainerPoint(e.latlng);
+      if(cp1.distanceTo(cp2)<12){ finishRuler(); return; }
+    }
     rulerPts.push(e.latlng);
     L.circleMarker(e.latlng,{radius:4,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler);
     if(rulerPts.length>=2)drawRulerLine(false);
@@ -413,11 +425,38 @@ function rulerClick(e){
       rulerPts.push(e.latlng);
       L.circleMarker(e.latlng,{radius:5,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler);
     }else{
+      // Klik kedua = kunci radius & finish
       var rr=rulerPts[0].distanceTo(e.latlng);
       drawRulerCircle(rr,false);
+      L.circleMarker(e.latlng,{radius:4,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler);
       showRuler('radius',rr,rr);
-      rulerPts=[rulerPts[0]];
+      finishRuler();
     }
+  }
+}
+
+function finishRuler(){
+  // Kunci hasil ukuran: hentikan preview tapi ruler tetap tampil di peta
+  rulerFinished=true;
+  map.off('mousemove',rulerMove);
+  map.off('click',rulerClick);
+  // Kembalikan kontrol peta ke mode aktif supaya bisa geser titik
+  if(mode==='nav'){ map.dragging.enable(); }
+  map.getContainer().style.cursor = (mode==='select')?'crosshair':'';
+  // Nonaktifkan highlight tombol ruler (tapi hasil tetap di peta)
+  document.getElementById('r-line').classList.remove('active');
+  document.getElementById('r-radius').classList.remove('active');
+  // Re-enable drag marker (karena ruler sebelumnya disable dragging)
+  Object.keys(markers).forEach(function(i){
+    i=parseInt(i); var s=state[i];
+    if(markers[i].dragging){ (!s.deleted&&mode==='nav')?markers[i].dragging.enable():markers[i].dragging.disable(); }
+  });
+  showToast('Hasil ukur dikunci · titik bisa digeser. Klik ✕ untuk hapus ruler');
+  // Update panel: tunjukkan status terkunci
+  var rp=document.getElementById('ruler-panel');
+  if(rp){
+    var lockBadge=rp.querySelector('.ruler-title span');
+    if(lockBadge) lockBadge.innerHTML='🔒 terkunci · ✕ tutup';
   }
 }
 function rulerMove(e){
@@ -448,8 +487,8 @@ function showRuler(m,total,last){
   var rp=document.getElementById('ruler-panel');
   if(!rp){var sb=document.getElementById('detail-panel');rp=document.createElement('div');rp.id='ruler-panel';rp.className='ruler-panel';sb.parentNode.insertBefore(rp,sb);}
   var sub = m==='line'
-    ? (rulerPts.length>1?'Segmen akhir: '+fmt(last)+' · '+rulerPts.length+' titik':'Klik peta untuk mulai. Klik lagi untuk tambah segmen.')
-    : (total>0?'Radius: '+fmt(total)+' · Keliling: '+fmt(2*Math.PI*total):'Klik peta untuk pusat, lalu klik lagi untuk radius.');
+    ? (rulerFinished?'🔒 Terkunci · '+rulerPts.length+' titik · '+fmt(total):(rulerPts.length>1?'Segmen akhir: '+fmt(last)+' · klik titik terakhir lagi untuk kunci':'Klik peta untuk mulai. Klik lagi = tambah segmen.'))
+    : (rulerFinished?'🔒 Terkunci · Radius '+fmt(total):(total>0?'Radius: '+fmt(total)+' · klik lagi untuk kunci':'Klik peta untuk pusat, lalu klik lagi untuk radius.'));
   rp.innerHTML='<div class="ruler-title">'+(m==='line'?'📏 Ukur Jarak':'⭕ Ukur Radius')+'<span style="font-size:10px;color:var(--text2);cursor:pointer" onclick="clearRuler()">✕ tutup</span></div><div class="ruler-val">'+fmt(total)+'</div><div class="ruler-sub">'+sub+'</div>';
 }
 
@@ -642,7 +681,7 @@ document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT')return;
   if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoLast();}
   else if(e.key==='Delete'||e.key==='Backspace'){if(selected.size>0){e.preventDefault();toggleDeleteMulti(Array.from(selected));}}
-  else if(e.key==='Escape'){clearSelection(true);renderEmpty();if(rulerMode)clearRuler();}
+  else if(e.key==='Escape'){clearSelection(true);renderEmpty();if(rulerMode&&!rulerFinished)clearRuler();}
 });
 
 // ── INIT ──────────────────────────────────────────────────

@@ -150,7 +150,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:8
   <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Kol-Ki</div>
   <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Kol-Ka</div>
   <div class="divider"></div>
-  <button class="btn btn-ghost" id="btn-undo" onclick="undoLast()" disabled>↩ Undo</button>
+  <button class="btn btn-ghost" id="btn-undo" onclick="undoLast()" disabled title="Ctrl+Z">↩ Undo</button>
   <button class="btn btn-ghost" onclick="resetView()">⊡ Fit</button>
 </div>
 
@@ -336,7 +336,8 @@ function setMode(m){
     i=parseInt(i); var s=state[i];
     if(markers[i].dragging){ (!s.deleted&&m==='nav')?markers[i].dragging.enable():markers[i].dragging.disable(); }
   });
-  if(m==='nav')renderEmpty();
+  // Hanya kosongkan panel kalau tidak ada seleksi aktif
+  if(m==='nav'&&selected.size===0)renderEmpty();
 }
 
 // ── RUBBER BAND (mode select) ─────────────────────────────
@@ -380,10 +381,12 @@ map.getContainer().addEventListener('mouseup',function(e){
   // Auto-switch ke Navigasi supaya bisa langsung geser titik terpilih
   if(selected.size>0){
     setMode('nav');
+    buildMarkers(filteredIdxs); // rebuild supaya marker terpilih tampil highlight
     renderMulti();
-    showToast(added+' titik terpilih · drag untuk geser');
+    showToast(added+' titik terpilih · drag salah satunya untuk geser semua');
   } else {
     buildMarkers(filteredIdxs);
+    renderEmpty();
   }
 });
 
@@ -629,9 +632,14 @@ function undoLast(){
   if(!history.length)return;
   var h=history.pop();
   if(h.type==='delete')h.idxs.forEach(function(i,k){state[i].deleted=h.prev[k];refreshMarker(i);});
-  else if(h.type==='move')h.prev.forEach(function(pp){state[pp.idx].lat=pp.lat;state[pp.idx].lng=pp.lng;state[pp.idx].moved=false;refreshMarker(pp.idx);});
+  else if(h.type==='move')h.prev.forEach(function(pp){
+    state[pp.idx].lat=pp.lat;state[pp.idx].lng=pp.lng;
+    var p=POINTS.find(function(x){return x.idx===pp.idx;});
+    state[pp.idx].moved=(Math.abs(pp.lat-p.lat_orig)>1e-9||Math.abs(pp.lng-p.lng_orig)>1e-9);
+    refreshMarker(pp.idx);
+  });
   if(selected.size>0)renderMulti(); else if(activeIdx!==null)renderDetail(activeIdx);
-  updateStats(); showToast('Undo');
+  updateStats(); showToast(h.type==='move'?'Undo geser titik':'Undo hapus titik');
 }
 
 // ── FILTERS ───────────────────────────────────────────────
@@ -678,13 +686,21 @@ function showToast(msg){
 
 // ── KEYBOARD ──────────────────────────────────────────────
 document.addEventListener('keydown',function(e){
-  if(e.target.tagName==='INPUT')return;
-  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoLast();}
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
+  if((e.ctrlKey||e.metaKey)&&(e.key==='z'||e.key==='Z')){e.preventDefault();undoLast();}
   else if(e.key==='Delete'||e.key==='Backspace'){if(selected.size>0){e.preventDefault();toggleDeleteMulti(Array.from(selected));}}
   else if(e.key==='Escape'){clearSelection(true);renderEmpty();if(rulerMode&&!rulerFinished)clearRuler();}
 });
 
 // ── INIT ──────────────────────────────────────────────────
+// Suppress browser context menu di area peta supaya klik kanan kita yang jalan
+map.getContainer().addEventListener('contextmenu',function(e){e.preventDefault();return false;});
+
+// Blur tombol setelah diklik supaya keyboard shortcut (Del, Ctrl+Z) tidak tersangkut di tombol
+document.addEventListener('click',function(e){
+  if(e.target.tagName==='BUTTON')e.target.blur();
+});
+
 buildMarkers(filteredIdxs);
 renderEmpty();
 resetView();

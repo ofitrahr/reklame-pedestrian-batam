@@ -692,6 +692,27 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){clearSelection(true);renderEmpty();if(rulerMode&&!rulerFinished)clearRuler();}
 });
 
+// ── EXPOSE TO WINDOW (untuk inline onclick HTML) ──────────
+window.toggleDeleteMulti=toggleDeleteMulti;
+window.nudgeOne=nudgeOne;
+window.nudgeSel=nudgeSel;
+window.resetPoint=resetPoint;
+window.toggleSelectOne=toggleSelectOne;
+window.selectSingle=selectSingle;
+window.clearSelection=clearSelection;
+window.renderEmpty=renderEmpty;
+window.renderMulti=renderMulti;
+window.renderDetail=renderDetail;
+window.listClick=listClick;
+window.undoLast=undoLast;
+window.setMode=setMode;
+window.setRuler=setRuler;
+window.clearRuler=clearRuler;
+window.toggleExport=toggleExport;
+window.doExport=doExport;
+window.resetView=resetView;
+window.selected=selected; // dipakai langsung di inline onclick
+
 // ── INIT ──────────────────────────────────────────────────
 // Suppress browser context menu di area peta supaya klik kanan kita yang jalan
 map.getContainer().addEventListener('contextmenu',function(e){e.preventDefault();return false;});

@@ -3,179 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebGIS Pedestrian Tambahan2 — Adjustment</title>
+<title>WebGIS Pedestrian Tambahan2</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0f1117; --surface:#181c27; --surface2:#1e2333; --border:#2a3044;
-  --accent:#4f9cf9; --green:#4fda8a; --yellow:#f9c74f; --red:#f95f4f;
-  --purple:#a78bfa; --orange:#f97b4f;
-  --text:#e8eaf0; --text2:#8b92a8;
-  --mono:'DM Mono',monospace; --sans:'Sora',sans-serif;
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--border:#2a3044;
+  --accent:#4f9cf9;--green:#4fda8a;--yellow:#f9c74f;--red:#f95f4f;
+  --purple:#a78bfa;--orange:#f97b4f;--cyan:#22d3ee;
+  --text:#e8eaf0;--text2:#8b92a8;
+  --mono:'DM Mono',monospace;--sans:'Sora',sans-serif;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--text); font-family:var(--sans); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-header {
-  background:var(--surface); border-bottom:1px solid var(--border);
-  padding:9px 16px; display:flex; align-items:center; gap:12px; flex-shrink:0;
-}
-.logo { font-size:13px; font-weight:600; color:var(--accent); letter-spacing:.05em; text-transform:uppercase; }
-.sub  { font-size:11px; color:var(--text2); font-family:var(--mono); }
-.hstats { margin-left:auto; display:flex; gap:14px; }
-.hs { text-align:center; }
-.hs-val { font-size:14px; font-weight:600; font-family:var(--mono); }
-.hs-lbl { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.05em; }
-.toolbar {
-  background:var(--surface2); border-bottom:1px solid var(--border);
-  padding:7px 14px; display:flex; align-items:center; gap:8px; flex-shrink:0; flex-wrap:wrap;
-}
-.toolbar label { font-size:11px; color:var(--text2); }
-.toolbar select {
-  background:var(--surface); border:1px solid var(--border); color:var(--text);
-  font-family:var(--mono); font-size:12px; padding:4px 9px; border-radius:4px; outline:none;
-}
-.toolbar select:focus { border-color:var(--accent); }
-.btn {
-  padding:5px 11px; border-radius:4px; border:none; cursor:pointer;
-  font-family:var(--sans); font-size:12px; font-weight:500; transition:all .15s;
-}
-.btn:hover { opacity:.85; }
-.btn:disabled { opacity:.4; cursor:not-allowed; }
-.btn-primary  { background:var(--accent); color:#fff; }
-.btn-success  { background:var(--green); color:#0f1117; }
-.btn-danger   { background:var(--red); color:#fff; }
-.btn-ghost    { background:transparent; color:var(--text2); border:1px solid var(--border); }
-.btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-.btn-mode     { background:var(--surface); border:1px solid var(--border); color:var(--text2); }
-.btn-mode.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-.btn-mode-sel { background:var(--surface); border:1px solid var(--border); color:var(--text2); }
-.btn-mode-sel.active { background:var(--purple); color:#fff; border-color:var(--purple); }
-.divider { width:1px; height:20px; background:var(--border); margin:0 2px; }
-.leg { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text2); }
-.leg-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-.main { flex:1; display:flex; overflow:hidden; }
-#map  { flex:1; height:100%; cursor:crosshair; }
-#map.mode-drag { cursor:default; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.logo{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;}
+.sub{font-size:11px;color:var(--text2);font-family:var(--mono);}
+.hstats{margin-left:auto;display:flex;gap:14px;}
+.hs{text-align:center;}
+.hs-val{font-size:14px;font-weight:600;font-family:var(--mono);}
+.hs-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;}
+.toolbar{background:var(--surface2);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:7px;flex-shrink:0;flex-wrap:wrap;}
+.toolbar label{font-size:11px;color:var(--text2);}
+.toolbar select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:4px;outline:none;}
+.btn{padding:4px 10px;border-radius:4px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;transition:all .15s;}
+.btn:hover{opacity:.85;} .btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-success{background:var(--green);color:#0f1117;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-tool{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:4px 10px;}
+.btn-tool.active{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.1);}
+.divider{width:1px;height:18px;background:var(--border);margin:0 2px;}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.main{flex:1;display:flex;overflow:hidden;position:relative;}
+#map{flex:1;height:100%;user-select:none;-webkit-user-select:none;}
+#sel-box{position:absolute;border:1.5px solid var(--accent);background:rgba(79,156,249,.1);pointer-events:none;display:none;z-index:9000;}
+.sidebar{width:280px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-hdr{padding:9px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;}
+.sb-body{flex:1;overflow-y:auto;padding:12px;}
+.sb-body::-webkit-scrollbar{width:3px;}
+.sb-body::-webkit-scrollbar-thumb{background:var(--border);}
+.empty-state{text-align:center;padding:24px 12px;color:var(--text2);font-size:12px;line-height:1.9;}
+.empty-state .ico{font-size:26px;margin-bottom:8px;}
+.d-id{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);margin-bottom:3px;}
+.d-meta{font-size:11px;color:var(--text2);margin-bottom:9px;line-height:1.6;}
+.badge-box{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-family:var(--mono);font-weight:500;}
+.b-art{background:rgba(79,156,249,.15);color:var(--accent);border:1px solid rgba(79,156,249,.3);}
+.b-kol{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3);}
+.b-kir{background:rgba(79,218,138,.12);color:var(--green);border:1px solid rgba(79,218,138,.25);}
+.b-kan{background:rgba(249,199,79,.12);color:var(--yellow);border:1px solid rgba(249,199,79,.25);}
+.b-del{background:rgba(249,95,79,.15);color:var(--red);border:1px solid rgba(249,95,79,.3);}
+.b-mov{background:rgba(249,123,79,.15);color:var(--orange);border:1px solid rgba(249,123,79,.3);}
+.coord-row{display:flex;gap:5px;margin-bottom:9px;}
+.coord-box{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;}
+.coord-box .lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.coord-box .val{font-family:var(--mono);font-size:10px;color:var(--text);}
+.drag-hint{font-size:11px;color:var(--yellow);background:rgba(249,199,79,.07);border:1px solid rgba(249,199,79,.18);border-radius:6px;padding:6px 9px;margin-bottom:9px;line-height:1.5;}
+.action-row{display:flex;gap:5px;margin-top:6px;}
+.multi-panel{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:11px;margin-bottom:10px;}
+.multi-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:7px;}
+.multi-list{max-height:100px;overflow-y:auto;margin-bottom:9px;}
+.multi-list::-webkit-scrollbar{width:2px;}
+.multi-item{font-family:var(--mono);font-size:10px;color:var(--text2);padding:1px 0;}
+.arrow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px;}
+.arrow-grid .btn-ghost{padding:4px;font-size:13px;text-align:center;}
 
-/* Selection box */
-#sel-box {
-  position:absolute; border:2px solid var(--accent);
-  background:rgba(79,156,249,.12); pointer-events:none;
-  display:none; z-index:9000;
-}
+/* Ruler panel */
+.ruler-panel{background:var(--surface2);border:1px solid rgba(34,211,238,.3);border-radius:7px;padding:10px;margin-bottom:10px;}
+.ruler-title{font-size:11px;font-weight:600;color:var(--cyan);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.ruler-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--cyan);margin-bottom:3px;}
+.ruler-sub{font-size:10px;color:var(--text2);}
 
-.sidebar {
-  width:290px; flex-shrink:0; background:var(--surface);
-  border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden;
-}
-.sb-hdr {
-  padding:10px 14px; border-bottom:1px solid var(--border);
-  font-size:11px; font-weight:600; color:var(--text2);
-  text-transform:uppercase; letter-spacing:.06em;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.sb-body { flex:1; overflow-y:auto; padding:14px; }
-.sb-body::-webkit-scrollbar { width:3px; }
-.sb-body::-webkit-scrollbar-thumb { background:var(--border); }
-.empty-state { text-align:center; padding:24px 12px; color:var(--text2); font-size:12px; line-height:1.8; }
-.empty-state .ico { font-size:26px; margin-bottom:8px; }
-.d-id   { font-family:var(--mono); font-size:12px; font-weight:500; color:var(--accent); margin-bottom:3px; }
-.d-meta { font-size:11px; color:var(--text2); margin-bottom:10px; line-height:1.6; }
-.badge-box { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
-.badge {
-  display:inline-block; padding:2px 8px; border-radius:20px;
-  font-size:10px; font-family:var(--mono); font-weight:500;
-}
-.badge-arteri   { background:rgba(79,156,249,.15);  color:var(--accent);  border:1px solid rgba(79,156,249,.3); }
-.badge-kolektor { background:rgba(167,139,250,.15); color:var(--purple);  border:1px solid rgba(167,139,250,.3); }
-.badge-kiri     { background:rgba(79,218,138,.12);  color:var(--green);   border:1px solid rgba(79,218,138,.25); }
-.badge-kanan    { background:rgba(249,199,79,.12);  color:var(--yellow);  border:1px solid rgba(249,199,79,.25); }
-.badge-deleted  { background:rgba(249,95,79,.15);   color:var(--red);     border:1px solid rgba(249,95,79,.3); }
-.badge-moved    { background:rgba(249,123,79,.15);  color:var(--orange);  border:1px solid rgba(249,123,79,.3); }
-.badge-sel      { background:rgba(167,139,250,.2);  color:var(--purple);  border:1px solid rgba(167,139,250,.4); }
-.coord-row { display:flex; gap:6px; margin-bottom:10px; }
-.coord-box {
-  flex:1; background:var(--surface2); border:1px solid var(--border);
-  border-radius:6px; padding:6px 8px;
-}
-.coord-box .lbl { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; }
-.coord-box .val { font-family:var(--mono); font-size:10px; color:var(--text); }
-.drag-hint {
-  font-size:11px; color:var(--yellow);
-  background:rgba(249,199,79,.07); border:1px solid rgba(249,199,79,.18);
-  border-radius:6px; padding:6px 9px; margin-bottom:9px; line-height:1.5;
-}
-.action-row { display:flex; gap:6px; margin-top:7px; }
+.list-panel{border-top:1px solid var(--border);height:180px;flex-shrink:0;overflow-y:auto;}
+.list-panel::-webkit-scrollbar{width:3px;}
+.list-panel::-webkit-scrollbar-thumb{background:var(--border);}
+.li{padding:5px 11px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .1s;}
+.li:hover{background:var(--surface2);}
+.li.active{background:rgba(79,156,249,.1);border-left:2px solid var(--accent);}
+.li.selected{background:rgba(167,139,250,.1);border-left:2px solid var(--purple);}
+.li-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.li-id{font-family:var(--mono);font-size:10px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.export-panel{border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
+.ep-hdr{padding:8px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;}
+.ep-hdr:hover{background:rgba(255,255,255,.03);}
+.ep-body{padding:0 13px 11px;display:none;}
+.ep-body.open{display:block;}
+.ep-summary{font-size:11px;color:var(--text2);margin-bottom:7px;line-height:1.7;}
+.ep-summary span{color:var(--text);font-family:var(--mono);}
+.ep-btns{display:flex;flex-direction:column;gap:5px;}
 
-/* Multi-select panel */
-.multi-panel {
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; padding:12px; margin-bottom:12px;
-}
-.multi-title { font-size:12px; font-weight:600; color:var(--purple); margin-bottom:8px; }
-.multi-list { max-height:120px; overflow-y:auto; margin-bottom:10px; }
-.multi-list::-webkit-scrollbar { width:2px; }
-.multi-list::-webkit-scrollbar-thumb { background:var(--border); }
-.multi-item { font-family:var(--mono); font-size:10px; color:var(--text2); padding:2px 0; }
+/* Basemap ctrl */
+.basemap-ctrl{background:var(--surface2);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.4);min-width:150px;}
+.bm-btn{display:block;width:100%;padding:6px 11px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:11px;cursor:pointer;text-align:left;transition:background .1s;}
+.bm-btn:last-child{border-bottom:none;}
+.bm-btn:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.bm-btn.active{color:var(--accent);font-weight:600;}
 
-.list-panel { border-top:1px solid var(--border); height:200px; flex-shrink:0; overflow-y:auto; }
-.list-panel::-webkit-scrollbar { width:3px; }
-.list-panel::-webkit-scrollbar-thumb { background:var(--border); }
-.li {
-  padding:6px 12px; border-bottom:1px solid var(--border);
-  cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .1s;
-}
-.li:hover { background:var(--surface2); }
-.li.active { background:rgba(79,156,249,.1); border-left:2px solid var(--accent); }
-.li.selected { background:rgba(167,139,250,.1); border-left:2px solid var(--purple); }
-.li-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.li-id  { font-family:var(--mono); font-size:10px; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* Ruler line on map */
+.ruler-tooltip{background:rgba(34,211,238,.9)!important;color:#0f1117!important;border:none!important;font-family:'DM Mono',monospace!important;font-size:11px!important;font-weight:500!important;padding:2px 7px!important;border-radius:4px!important;}
 
-.export-panel { border-top:1px solid var(--border); background:var(--surface2); flex-shrink:0; }
-.ep-hdr {
-  padding:9px 14px; display:flex; align-items:center; justify-content:space-between;
-  cursor:pointer; font-size:11px; font-weight:600; color:var(--text2);
-  text-transform:uppercase; letter-spacing:.06em;
-}
-.ep-hdr:hover { background:rgba(255,255,255,.03); }
-.ep-body { padding:0 14px 12px; display:none; }
-.ep-body.open { display:block; }
-.ep-summary { font-size:11px; color:var(--text2); margin-bottom:8px; line-height:1.7; }
-.ep-summary span { color:var(--text); font-family:var(--mono); }
-.ep-btns { display:flex; flex-direction:column; gap:5px; }
-
-/* Basemap switcher */
-.basemap-ctrl {
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:6px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.4);
-}
-.bm-btn {
-  display:block; width:100%; padding:7px 12px; background:transparent;
-  border:none; border-bottom:1px solid var(--border); color:var(--text2);
-  font-family:var(--sans); font-size:11px; cursor:pointer; text-align:left;
-  transition:background .1s;
-}
-.bm-btn:last-child { border-bottom:none; }
-.bm-btn:hover { background:rgba(255,255,255,.05); color:var(--text); }
-.bm-btn.active { color:var(--accent); font-weight:600; }
-
-.leaflet-popup-content-wrapper {
-  background:var(--surface2)!important; border:1px solid var(--border)!important;
-  color:var(--text)!important; border-radius:8px!important;
-  box-shadow:0 4px 24px rgba(0,0,0,.5)!important;
-}
-.leaflet-popup-content { color:var(--text)!important; font-family:var(--sans)!important; font-size:11px!important; margin:8px 11px!important; }
-.leaflet-popup-tip { background:var(--surface2)!important; }
-.leaflet-popup-close-button { color:var(--text2)!important; }
-
-/* Selected marker ring */
-.marker-selected::before {
-  content:''; position:absolute; inset:-4px; border-radius:50%;
-  border:2px solid var(--purple); animation:spin 2s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
+.leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border)!important;color:var(--text)!important;border-radius:8px!important;box-shadow:0 4px 24px rgba(0,0,0,.5)!important;}
+.leaflet-popup-content{color:var(--text)!important;font-family:var(--sans)!important;font-size:11px!important;margin:8px 11px!important;}
+.leaflet-popup-tip{background:var(--surface2)!important;}
+.leaflet-popup-close-button{color:var(--text2)!important;}
 </style>
 </head>
 <body>
@@ -183,24 +118,23 @@ header {
 <header>
   <div>
     <div class="logo">WebGIS Pedestrian — Tambahan 2</div>
-    <div class="sub">892 titik · drag/select untuk adjust · klik kanan untuk hapus</div>
+    <div class="sub">Klik kiri = pilih · Klik+drag = geser seleksi · Klik kanan+drag = pan peta</div>
   </div>
   <div class="hstats">
     <div class="hs"><div class="hs-val" id="hs-total" style="color:var(--accent)">892</div><div class="hs-lbl">Total</div></div>
     <div class="hs"><div class="hs-val" id="hs-aktif" style="color:var(--green)">892</div><div class="hs-lbl">Aktif</div></div>
-    <div class="hs"><div class="hs-val" id="hs-sel" style="color:var(--purple)">0</div><div class="hs-lbl">Terpilih</div></div>
+    <div class="hs"><div class="hs-val" id="hs-sel"   style="color:var(--purple)">0</div><div class="hs-lbl">Terpilih</div></div>
     <div class="hs"><div class="hs-val" id="hs-moved" style="color:var(--orange)">0</div><div class="hs-lbl">Dipindah</div></div>
     <div class="hs"><div class="hs-val" id="hs-deleted" style="color:var(--red)">0</div><div class="hs-lbl">Dihapus</div></div>
   </div>
 </header>
 
 <div class="toolbar">
-  <!-- Mode buttons -->
-  <span style="font-size:11px;color:var(--text2)">Mode:</span>
-  <button class="btn btn-mode active" id="btn-drag-mode" onclick="setMode('drag')" title="Drag titik satu per satu">✋ Drag</button>
-  <button class="btn btn-mode-sel" id="btn-sel-mode" onclick="setMode('select')" title="Gambar kotak untuk pilih banyak titik">⬚ Select</button>
+  <span style="font-size:11px;color:var(--text2)">Ruler:</span>
+  <button class="btn btn-tool" id="btn-ruler-line"   onclick="setRuler('line')"   title="Ukur jarak antar titik">📏 Garis</button>
+  <button class="btn btn-tool" id="btn-ruler-radius" onclick="setRuler('radius')" title="Ukur radius dari satu titik">⭕ Radius</button>
+  <button class="btn btn-ghost" id="btn-ruler-clear"  onclick="clearRuler()" style="font-size:11px">✕ Reset</button>
   <div class="divider"></div>
-  <!-- Filters -->
   <label>Fungsi</label>
   <select id="f-fungsi"><option value="">Semua</option><option>Arteri</option><option>Kolektor</option></select>
   <label>Sisi</label>
@@ -210,15 +144,16 @@ header {
   <div class="divider"></div>
   <div class="leg"><div class="leg-dot" style="background:var(--accent)"></div>Arteri Kiri</div>
   <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div>Arteri Kanan</div>
-  <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Kolektor Kiri</div>
-  <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Kolektor Kanan</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Kol Kiri</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Kol Kanan</div>
   <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Hapus</div>
   <div class="divider"></div>
-  <button class="btn btn-ghost" onclick="resetView()">Reset</button>
+  <button class="btn btn-ghost" onclick="clearSelection(true)">✕ Batal Pilih</button>
   <button class="btn btn-ghost" id="btn-undo" onclick="undoLast()" disabled>↩ Undo</button>
+  <button class="btn btn-ghost" onclick="resetView()">Reset View</button>
 </div>
 
-<div class="main" style="position:relative">
+<div class="main">
   <div id="map"></div>
   <div id="sel-box"></div>
 
@@ -230,9 +165,11 @@ header {
     <div class="sb-body" id="detail-panel">
       <div class="empty-state">
         <div class="ico">🚶</div>
-        <b style="color:var(--accent)">Mode Drag:</b> klik titik lalu drag.<br>
-        <b style="color:var(--purple)">Mode Select:</b> seret kotak untuk pilih banyak titik, lalu geser atau hapus.<br><br>
-        Klik kanan titik = hapus/pulihkan.
+        <b style="color:var(--accent)">Klik kiri</b> = pilih/blok titik<br>
+        <b style="color:var(--accent)">Klik+drag</b> = geser titik terpilih<br>
+        <b style="color:var(--text2)">Klik kanan+drag</b> = pan peta<br>
+        <b style="color:var(--red)">Klik kanan titik</b> = hapus/pulihkan<br><br>
+        <b style="color:var(--cyan)">Ruler:</b> pilih mode di toolbar
       </div>
     </div>
     <div class="list-panel" id="list-panel"></div>
@@ -258,49 +195,51 @@ let POINTS = [{"idx": 0, "line_id": 1, "fungsi": "Arteri", "sisi": "Kiri", "jara
 const LINES = {"type": "FeatureCollection", "features": [{"id": "0", "type": "Feature", "properties": {"id": 1, "fungsi_jalan": "Arteri"}, "geometry": {"type": "MultiLineString", "coordinates": [[[104.02332934486918, 1.068663408918877], [104.02712657373927, 1.075805100688071]]]}}, {"id": "1", "type": "Feature", "properties": {"id": 2, "fungsi_jalan": "Kolektor"}, "geometry": {"type": "MultiLineString", "coordinates": [[[104.02479394137895, 1.071092196483717], [104.03515222171504, 1.0652784117264362]]]}}]};
 
 const state = {};
-POINTS.forEach(p => {
-  state[p.idx] = { lat:p.lat, lng:p.lng, deleted:false, moved:false };
-});
+POINTS.forEach(p => { state[p.idx] = {lat:p.lat,lng:p.lng,deleted:false,moved:false}; });
 const history = [];
-let selected = new Set(); // multi-select set of idx
+let selected = new Set();
+let activeIdx = null;
+let filteredIdxs = new Set(POINTS.map(p=>p.idx));
 
-// ── MAP ───────────────────────────────────────────────────
-const map = L.map('map', { center:[1.07,104.03], zoom:16, zoomControl:false, attributionControl:false });
+// ── MAP (disable default interactions) ────────────────────
+const map = L.map('map', {
+  center:[1.07,104.03], zoom:16,
+  zoomControl:false, attributionControl:false,
+  dragging:false,          // kita handle sendiri via right-click
+  scrollWheelZoom:true,
+  doubleClickZoom:false,
+});
 L.control.zoom({position:'bottomright'}).addTo(map);
 
-// BASEMAPS
+// ── BASEMAPS ──────────────────────────────────────────────
 const basemaps = {
-  'Google Satellite'  : L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom:22}),
-  'Google Hybrid'     : L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {maxZoom:22}),
-  'Google Maps'       : L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom:22}),
-  'OSM Dark (Carto)'  : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom:22}),
-  'OSM Standard'      : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}),
+  'Google Satellite' : L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:22}),
+  'Google Hybrid'    : L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}),
+  'Google Maps'      : L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:22}),
+  'Carto Dark'       : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:22}),
+  'OSM Standard'     : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}),
 };
-let activeBasemap = 'Google Satellite';
-basemaps[activeBasemap].addTo(map);
+let activeBM = 'Google Satellite';
+basemaps[activeBM].addTo(map);
 
-// Custom basemap control
 const BmCtrl = L.Control.extend({
-  options: {position:'topright'},
+  options:{position:'topright'},
   onAdd() {
     const wrap = L.DomUtil.create('div','basemap-ctrl');
     Object.keys(basemaps).forEach(name => {
       const btn = L.DomUtil.create('button','bm-btn',wrap);
       btn.textContent = name;
-      if (name===activeBasemap) btn.classList.add('active');
-      btn.id = 'bm-'+name.replace(/\s/g,'_');
+      if (name===activeBM) btn.classList.add('active');
       L.DomEvent.on(btn,'click', e => {
         L.DomEvent.stopPropagation(e);
-        if (name===activeBasemap) return;
-        map.removeLayer(basemaps[activeBasemap]);
-        basemaps[name].addTo(map);
-        basemaps[name].bringToBack();
+        if (name===activeBM) return;
+        map.removeLayer(basemaps[activeBM]);
+        basemaps[name].addTo(map).bringToBack();
         document.querySelectorAll('.bm-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        activeBasemap = name;
+        activeBM = name;
       });
     });
-    // Prevent map click-through
     L.DomEvent.disableClickPropagation(wrap);
     L.DomEvent.disableScrollPropagation(wrap);
     return wrap;
@@ -308,353 +247,481 @@ const BmCtrl = L.Control.extend({
 });
 new BmCtrl().addTo(map);
 
+// ── LAYERS ────────────────────────────────────────────────
 const layerLines  = L.layerGroup().addTo(map);
 const layerPoints = L.layerGroup().addTo(map);
+const layerRuler  = L.layerGroup().addTo(map);
 
-// ── COLORS & ICONS ────────────────────────────────────────
+LINES.features.forEach(f => {
+  L.geoJSON(f,{style:{color:f.properties.fungsi_jalan==='Arteri'?'#4f9cf966':'#a78bfa66',weight:2,dashArray:'5 4'}}).addTo(layerLines);
+});
+
+// ── ICONS ─────────────────────────────────────────────────
 function ptColor(p) {
-  const s = state[p.idx];
+  const s=state[p.idx];
   if (s.deleted) return '#f95f4f';
   if (selected.has(p.idx)) return '#c4b5fd';
-  if (p.fungsi==='Arteri'  && p.sisi==='Kiri')  return '#4f9cf9';
-  if (p.fungsi==='Arteri'  && p.sisi==='Kanan') return '#a78bfa';
-  if (p.fungsi==='Kolektor'&& p.sisi==='Kiri')  return '#4fda8a';
-  if (p.fungsi==='Kolektor'&& p.sisi==='Kanan') return '#f9c74f';
+  if (p.fungsi==='Arteri'  &&p.sisi==='Kiri')  return '#4f9cf9';
+  if (p.fungsi==='Arteri'  &&p.sisi==='Kanan') return '#a78bfa';
+  if (p.fungsi==='Kolektor'&&p.sisi==='Kiri')  return '#4fda8a';
+  if (p.fungsi==='Kolektor'&&p.sisi==='Kanan') return '#f9c74f';
   return '#aaa';
 }
-function makeIcon(col, sz=10, ring=false, deleted=false) {
-  const border = ring ? '2px solid #fff' : '1.5px solid rgba(255,255,255,0.5)';
-  const shadow = ring ? `0 0 0 2px ${col}, 0 0 10px ${col}` : `0 0 4px ${col}80`;
+function makeIcon(col,sz=9,ring=false,deleted=false) {
   return L.divIcon({
     className:'',
     html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;
-      background:${col};border:${border};box-shadow:${shadow};
-      cursor:${deleted?'not-allowed':currentMode==='select'?'crosshair':'grab'};
-      opacity:${deleted?0.4:1};transition:box-shadow .1s;"></div>`,
-    iconSize:[sz,sz], iconAnchor:[sz/2,sz/2]
+      background:${col};
+      border:${ring?'2px solid #fff':'1.5px solid rgba(255,255,255,.5)'};
+      box-shadow:${ring?`0 0 0 2px ${col},0 0 8px ${col}`:`0 0 4px ${col}80`};
+      cursor:default;
+      opacity:${deleted?.4:1};"></div>`,
+    iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]
   });
 }
 
-// ── DRAW LINES ────────────────────────────────────────────
-LINES.features.forEach(f => {
-  L.geoJSON(f, {
-    style: { color: f.properties.fungsi_jalan==='Arteri'?'#4f9cf966':'#a78bfa66', weight:2, dashArray:'5 4' }
-  }).addTo(layerLines);
-});
-
-// ── MARKERS ───────────────────────────────────────────────
 let markers = {};
-let activeIdx = null;
-let filteredIdxs = new Set(POINTS.map(p=>p.idx));
-let currentMode = 'drag'; // 'drag' | 'select'
 
 function buildMarkers(idxSet) {
-  layerPoints.clearLayers();
-  markers = {};
+  layerPoints.clearLayers(); markers={};
   POINTS.forEach(p => {
     if (!idxSet.has(p.idx)) return;
-    const s = state[p.idx];
-    const col = ptColor(p);
-    const isSel = selected.has(p.idx);
-    const m = L.marker([s.lat,s.lng], {
-      icon: makeIcon(col, isSel?12:9, isSel, s.deleted),
-      draggable: currentMode==='drag' && !s.deleted,
-      zIndexOffset: s.deleted?0:isSel?200:100
-    }).addTo(layerPoints);
-
-    m.bindTooltip(`#${p.idx+1} ${p.fungsi} ${p.sisi}`, {direction:'top',offset:[0,-5],opacity:.85});
-
-    m.on('click', e => {
-      if (currentMode==='select') {
-        // Toggle select on click
-        L.DomEvent.stopPropagation(e);
-        if (selected.has(p.idx)) selected.delete(p.idx);
-        else selected.add(p.idx);
-        refreshMarker(p.idx);
-        renderMultiDetail();
-        updateStats();
-      } else {
-        selectPoint(p.idx);
-      }
-    });
-
-    m.on('contextmenu', e => {
-      L.DomEvent.preventDefault(e);
-      const idxs = selected.size > 0 ? [...selected] : [p.idx];
-      toggleDeleteMulti(idxs);
-    });
-
-    m.on('dragstart', () => map.dragging.disable());
-    m.on('drag', e => {
-      const ll = e.target.getLatLng();
-      state[p.idx].lat = ll.lat;
-      state[p.idx].lng = ll.lng;
-      if (activeIdx===p.idx) updateCoordBox(ll.lat, ll.lng);
-    });
-    m.on('dragend', e => {
-      map.dragging.enable();
-      const ll = e.target.getLatLng();
-      history.push({type:'move',idxs:[p.idx],prev:[{idx:p.idx,lat:p.lat_orig,lng:p.lng_orig}]});
-      state[p.idx] = {lat:ll.lat,lng:ll.lng,deleted:false,moved:true};
-      refreshMarker(p.idx);
-      if (activeIdx===p.idx) renderDetail(p.idx);
-      updateStats();
-    });
-    markers[p.idx] = m;
+    const s=state[p.idx]; const col=ptColor(p); const isSel=selected.has(p.idx);
+    const m = L.marker([s.lat,s.lng],{icon:makeIcon(col,isSel?12:9,isSel,s.deleted),zIndexOffset:isSel?200:100})
+      .addTo(layerPoints);
+    m.bindTooltip(`#${p.idx+1} ${p.fungsi} ${p.sisi}`,{direction:'top',offset:[0,-5],opacity:.85});
+    markers[p.idx]=m;
   });
-  buildList(idxSet);
-  updateStats();
+  buildList(idxSet); updateStats();
 }
 
 function refreshMarker(idx) {
-  const p = POINTS.find(p=>p.idx===idx); if(!p||!markers[idx]) return;
-  const s = state[idx];
-  const isSel = selected.has(idx);
-  const col = ptColor(p);
-  markers[idx].setIcon(makeIcon(col, isSel?12:9, isSel, s.deleted));
+  const p=POINTS.find(p=>p.idx===idx); if(!p||!markers[idx]) return;
+  const s=state[idx]; const isSel=selected.has(idx); const col=ptColor(p);
+  markers[idx].setIcon(makeIcon(col,isSel?12:9,isSel,s.deleted));
   markers[idx].setLatLng([s.lat,s.lng]);
 }
 
-// ── MODE ──────────────────────────────────────────────────
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById('btn-drag-mode').classList.toggle('active',   mode==='drag');
-  document.getElementById('btn-sel-mode').classList.toggle('active',    mode==='select');
-  const mapEl = document.getElementById('map');
-  if (mode==='drag') { mapEl.classList.add('mode-drag'); mapEl.style.cursor=''; }
-  else { mapEl.classList.remove('mode-drag'); mapEl.style.cursor='crosshair'; }
-  // Update draggable
-  POINTS.forEach(p => {
-    if (!markers[p.idx]) return;
-    if (mode==='drag' && !state[p.idx].deleted) markers[p.idx].dragging?.enable();
-    else markers[p.idx].dragging?.disable();
-  });
-  if (mode==='select') clearSelection(false);
+// ══════════════════════════════════════════════════════════
+// MOUSE INTERACTION — full custom
+// ══════════════════════════════════════════════════════════
+const mapEl = document.getElementById('map');
+const selBox = document.getElementById('sel-box');
+const mapRect = () => mapEl.getBoundingClientRect();
+
+let mouseState = {
+  down:false, button:-1,
+  startX:0, startY:0,
+  dragging:false,        // currently rubber-banding or panning
+  movingSelection:false, // dragging selected points
+  lastLL:null,           // last latlng for delta calculation
+};
+
+// Util: pixel → latlng relative to map container
+function pxToLL(x,y) {
+  const r = mapRect();
+  return map.containerPointToLatLng(L.point(x-r.left, y-r.top));
 }
 
-// ── RUBBER BAND SELECT ────────────────────────────────────
-let selStart = null, selRect = null;
-const selBox = document.getElementById('sel-box');
+// ── MOUSEDOWN ────────────────────────────────────────────
+mapEl.addEventListener('mousedown', e => {
+  // Don't interfere with marker events if they stop propagation
+  if (rulerMode) return;
 
-map.on('mousedown', e => {
-  if (currentMode!=='select') return;
-  if (e.originalEvent.button!==0) return;
-  map.dragging.disable();
-  selStart = e.containerPoint;
-  selBox.style.display='block';
-  selBox.style.left=selStart.x+'px'; selBox.style.top=selStart.y+'px';
-  selBox.style.width='0'; selBox.style.height='0';
-});
+  mouseState.down   = true;
+  mouseState.button = e.button;
+  mouseState.startX = e.clientX;
+  mouseState.startY = e.clientY;
+  mouseState.dragging = false;
+  mouseState.movingSelection = false;
 
-map.on('mousemove', e => {
-  if (!selStart) return;
-  const cur = e.containerPoint;
-  const x = Math.min(selStart.x,cur.x), y = Math.min(selStart.y,cur.y);
-  const w = Math.abs(cur.x-selStart.x), h = Math.abs(cur.y-selStart.y);
-  selBox.style.left=x+'px'; selBox.style.top=y+'px';
-  selBox.style.width=w+'px'; selBox.style.height=h+'px';
-});
+  if (e.button===2) {
+    // Right-click: start pan
+    e.preventDefault();
+    map.dragging.enable();
+  }
 
-map.on('mouseup', e => {
-  if (!selStart || currentMode!=='select') return;
-  map.dragging.enable();
-  const cur = e.containerPoint;
-  selBox.style.display='none';
-  // Bounding box dalam latlng
-  const sw = map.containerPointToLatLng(L.point(Math.min(selStart.x,cur.x), Math.max(selStart.y,cur.y)));
-  const ne = map.containerPointToLatLng(L.point(Math.max(selStart.x,cur.x), Math.min(selStart.y,cur.y)));
-  const bounds = L.latLngBounds(sw,ne);
-  selStart = null;
+  if (e.button===0) {
+    // Check if click landed on a marker
+    const ll = pxToLL(e.clientX, e.clientY);
+    const hit = findMarkerAt(ll, 12); // 12px hit radius
+    if (hit!==null && !state[hit].deleted) {
+      // Clicked on a marker → either add to selection or start drag
+      if (!selected.has(hit)) {
+        if (!e.shiftKey) clearSelection(true);
+        selected.add(hit);
+        refreshMarker(hit);
+        renderMultiDetail();
+        updateStats();
+      }
+      mouseState.movingSelection = true;
+      mouseState.lastLL = ll;
+    } else {
+      // Clicked empty space → start rubber-band
+      if (!e.shiftKey) clearSelection(true);
+      mouseState.dragging = true;
+      const r = mapRect();
+      selBox.style.left  = (e.clientX-r.left)+'px';
+      selBox.style.top   = (e.clientY-r.top)+'px';
+      selBox.style.width = '0'; selBox.style.height='0';
+      selBox.style.display='block';
+    }
+  }
+}, {passive:false});
 
-  // Jika klik tanpa seret = clear selection
-  if (bounds.getNorthEast().distanceTo(bounds.getSouthWest()) < 5) {
-    clearSelection(true);
+// ── MOUSEMOVE ─────────────────────────────────────────────
+mapEl.addEventListener('mousemove', e => {
+  if (!mouseState.down) return;
+
+  if (mouseState.button===2) {
+    // Right-click pan — Leaflet handles via map.dragging
     return;
   }
 
-  // Pilih semua titik dalam kotak
-  let added = 0;
-  POINTS.forEach(p => {
-    if (!filteredIdxs.has(p.idx)) return;
-    const s = state[p.idx];
-    if (bounds.contains([s.lat,s.lng])) {
-      selected.add(p.idx); added++;
-    }
-  });
-  if (added>0) {
-    selected.forEach(idx => refreshMarker(idx));
-    renderMultiDetail();
-    updateStats();
+  if (mouseState.movingSelection && selected.size>0) {
+    const ll  = pxToLL(e.clientX, e.clientY);
+    const dLat = ll.lat - mouseState.lastLL.lat;
+    const dLng = ll.lng - mouseState.lastLL.lng;
+    mouseState.lastLL = ll;
+    selected.forEach(idx => {
+      state[idx].lat += dLat;
+      state[idx].lng += dLng;
+      state[idx].moved = true;
+      if (markers[idx]) markers[idx].setLatLng([state[idx].lat, state[idx].lng]);
+    });
+    updateCoordBoxFromSelected();
+    return;
+  }
+
+  if (mouseState.dragging) {
+    const r = mapRect();
+    const x0=parseFloat(selBox.style.left), y0=parseFloat(selBox.style.top);
+    const cx=e.clientX-r.left, cy=e.clientY-r.top;
+    const x=Math.min(e.clientX-r.left, mouseState.startX-r.left);
+    const y=Math.min(e.clientY-r.top,  mouseState.startY-r.top);
+    selBox.style.left  =x+'px'; selBox.style.top=y+'px';
+    selBox.style.width =Math.abs(cx-(mouseState.startX-r.left))+'px';
+    selBox.style.height=Math.abs(cy-(mouseState.startY-r.top))+'px';
   }
 });
 
-function clearSelection(refresh=true) {
-  const prev = [...selected];
-  selected.clear();
-  if (refresh) prev.forEach(idx => refreshMarker(idx));
-  updateStats();
-}
+// ── MOUSEUP ───────────────────────────────────────────────
+mapEl.addEventListener('mouseup', e => {
+  if (!mouseState.down) return;
 
-// ── MOVE SELECTION ────────────────────────────────────────
-// Tambah tombol "Geser Seleksi" di panel detail (manual offset input)
-function moveSelectionBy(dlat, dlng) {
-  if (selected.size===0) return;
-  const prevState = [...selected].map(idx => ({idx, lat:state[idx].lat, lng:state[idx].lng}));
-  history.push({type:'move', idxs:[...selected], prev:prevState});
-  selected.forEach(idx => {
-    state[idx].lat += dlat;
-    state[idx].lng += dlng;
-    state[idx].moved = true;
-    refreshMarker(idx);
-  });
-  renderMultiDetail();
-  updateStats();
-}
-
-// ── SELECT / DESELECT ALL ─────────────────────────────────
-function selectAll() {
-  filteredIdxs.forEach(idx => {
-    if (!state[idx].deleted) selected.add(idx);
-  });
-  selected.forEach(idx => refreshMarker(idx));
-  renderMultiDetail();
-  updateStats();
-}
-
-// ── DELETE MULTI ──────────────────────────────────────────
-function toggleDeleteMulti(idxs) {
-  const allDeleted = idxs.every(idx => state[idx].deleted);
-  history.push({type:'delete', idxs, prev: idxs.map(idx=>state[idx].deleted)});
-  idxs.forEach(idx => {
-    state[idx].deleted = !allDeleted;
-    if (!allDeleted) state[idx].moved = false;
-    refreshMarker(idx);
-  });
-  if (idxs.length===1 && activeIdx===idxs[0]) renderDetail(idxs[0]);
-  else if (selected.size>0) renderMultiDetail();
-  updateStats();
-}
-
-// ── RENDER DETAIL (SINGLE) ────────────────────────────────
-function selectPoint(idx) {
-  clearSelection(true);
-  if (activeIdx!==null) {
-    const prevLi = document.getElementById('li-'+activeIdx);
-    if (prevLi) prevLi.classList.remove('active');
+  if (mouseState.button===2) {
+    map.dragging.disable();
+    mouseState.down=false; mouseState.button=-1;
+    return;
   }
-  activeIdx = idx;
-  refreshMarker(idx);
-  map.panTo([state[idx].lat, state[idx].lng]);
-  renderDetail(idx);
-  const li = document.getElementById('li-'+idx);
-  if (li) { li.classList.add('active'); li.scrollIntoView({block:'nearest'}); }
+
+  if (mouseState.movingSelection && selected.size>0) {
+    // Commit move to history
+    const idxs = [...selected];
+    history.push({type:'move', idxs,
+      prev: idxs.map(idx=>{const p=POINTS.find(p=>p.idx===idx); return {idx,lat:p.lat_orig,lng:p.lng_orig};})
+    });
+    idxs.forEach(idx => refreshMarker(idx));
+    renderMultiDetail(); updateStats();
+  }
+
+  if (mouseState.dragging) {
+    selBox.style.display='none';
+    const r   = mapRect();
+    const sw  = pxToLL(Math.min(e.clientX,mouseState.startX), Math.max(e.clientY,mouseState.startY));
+    const ne  = pxToLL(Math.max(e.clientX,mouseState.startX), Math.min(e.clientY,mouseState.startY));
+    const bounds = L.latLngBounds(sw,ne);
+    if (bounds.getNorthEast().distanceTo(bounds.getSouthWest()) > 2) {
+      POINTS.forEach(p => {
+        if (!filteredIdxs.has(p.idx)||state[p.idx].deleted) return;
+        const s=state[p.idx];
+        if (bounds.contains([s.lat,s.lng])) selected.add(p.idx);
+      });
+      selected.forEach(idx => refreshMarker(idx));
+      renderMultiDetail(); updateStats();
+    }
+  }
+
+  mouseState.down=false; mouseState.button=-1;
+  mouseState.dragging=false; mouseState.movingSelection=false;
+});
+
+// Prevent browser context menu
+mapEl.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  // Right-click on a marker → delete/restore
+  if (!mouseState.dragging && !mouseState.movingSelection) {
+    const ll  = pxToLL(e.clientX, e.clientY);
+    const hit = findMarkerAt(ll, 14);
+    if (hit!==null) {
+      const targets = selected.has(hit) && selected.size>1 ? [...selected] : [hit];
+      toggleDeleteMulti(targets);
+    }
+  }
+});
+
+// ── HELPER: hit-test marker ───────────────────────────────
+function findMarkerAt(ll, pxRadius) {
+  let best=null, bestD=Infinity;
+  Object.entries(markers).forEach(([idx,m]) => {
+    const mll = m.getLatLng();
+    const cp1 = map.latLngToContainerPoint(ll);
+    const cp2 = map.latLngToContainerPoint(mll);
+    const d   = cp1.distanceTo(cp2);
+    if (d < pxRadius && d < bestD) { bestD=d; best=parseInt(idx); }
+  });
+  return best;
+}
+
+// ══════════════════════════════════════════════════════════
+// RULER
+// ══════════════════════════════════════════════════════════
+let rulerMode = null; // 'line' | 'radius' | null
+let rulerPoints = [];
+let rulerLayer  = null; // active drawing layer
+let rulerCircle = null;
+
+function setRuler(mode) {
+  clearRuler();
+  rulerMode = mode;
+  document.getElementById('btn-ruler-line').classList.toggle('active',   mode==='line');
+  document.getElementById('btn-ruler-radius').classList.toggle('active', mode==='radius');
+  mapEl.style.cursor = 'crosshair';
+  map.off('click', onRulerClick);
+  map.on('click', onRulerClick);
+  map.on('mousemove', onRulerMove);
+}
+
+function clearRuler() {
+  rulerMode=null; rulerPoints=[];
+  if(rulerLayer){layerRuler.removeLayer(rulerLayer);rulerLayer=null;}
+  if(rulerCircle){layerRuler.removeLayer(rulerCircle);rulerCircle=null;}
+  layerRuler.clearLayers();
+  map.off('click',onRulerClick); map.off('mousemove',onRulerMove);
+  document.getElementById('btn-ruler-line').classList.remove('active');
+  document.getElementById('btn-ruler-radius').classList.remove('active');
+  mapEl.style.cursor='';
+  // Clear ruler panel dari sidebar
+  const rp=document.getElementById('ruler-panel');
+  if(rp) rp.remove();
+}
+
+function onRulerClick(e) {
+  if (rulerMode==='line') {
+    rulerPoints.push(e.latlng);
+    if (rulerPoints.length>=2) {
+      // Draw segment
+      const dist = rulerPoints[rulerPoints.length-2].distanceTo(rulerPoints[rulerPoints.length-1]);
+      const total = computeLineTotal();
+      if (rulerLayer) layerRuler.removeLayer(rulerLayer);
+      rulerLayer = L.polyline(rulerPoints,{color:'#22d3ee',weight:2,dashArray:'4 3'})
+        .bindTooltip(fmtDist(total),{permanent:true,direction:'top',className:'ruler-tooltip'})
+        .addTo(layerRuler);
+      // Draw dots
+      rulerPoints.forEach(ll => L.circleMarker(ll,{radius:4,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler));
+      showRulerPanel('line', total, dist);
+    } else {
+      L.circleMarker(e.latlng,{radius:5,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler);
+      showRulerPanel('line',0,0);
+    }
+  } else if (rulerMode==='radius') {
+    if (rulerPoints.length===0) {
+      rulerPoints.push(e.latlng);
+      L.circleMarker(e.latlng,{radius:5,color:'#22d3ee',fillColor:'#22d3ee',fillOpacity:1,weight:1}).addTo(layerRuler);
+      showRulerPanel('radius',0,0);
+    } else {
+      const r = rulerPoints[0].distanceTo(e.latlng);
+      if(rulerCircle) layerRuler.removeLayer(rulerCircle);
+      rulerCircle = L.circle(rulerPoints[0],{radius:r,color:'#22d3ee',weight:1.5,dashArray:'4 3',fillColor:'#22d3ee',fillOpacity:.07})
+        .bindTooltip(fmtDist(r),{permanent:true,direction:'top',className:'ruler-tooltip'})
+        .addTo(layerRuler);
+      showRulerPanel('radius',r,r);
+      rulerPoints=[rulerPoints[0]]; // reset untuk radius baru
+    }
+  }
+}
+
+// Live preview line saat mouse bergerak
+function onRulerMove(e) {
+  if (rulerMode==='line' && rulerPoints.length>0) {
+    const pts=[...rulerPoints, e.latlng];
+    if(rulerLayer) layerRuler.removeLayer(rulerLayer);
+    rulerLayer = L.polyline(pts,{color:'#22d3ee',weight:1.5,dashArray:'3 3',opacity:.6}).addTo(layerRuler);
+    const total = computeLineTotal() + rulerPoints[rulerPoints.length-1].distanceTo(e.latlng);
+    showRulerPanel('line', total, rulerPoints[rulerPoints.length-1].distanceTo(e.latlng));
+  } else if (rulerMode==='radius' && rulerPoints.length>0) {
+    const r = rulerPoints[0].distanceTo(e.latlng);
+    if(rulerCircle) layerRuler.removeLayer(rulerCircle);
+    rulerCircle = L.circle(rulerPoints[0],{radius:r,color:'#22d3ee',weight:1.5,dashArray:'3 3',fillColor:'#22d3ee',fillOpacity:.05}).addTo(layerRuler);
+    showRulerPanel('radius',r,r);
+  }
+}
+
+function computeLineTotal() {
+  let d=0;
+  for(let i=1;i<rulerPoints.length;i++) d+=rulerPoints[i-1].distanceTo(rulerPoints[i]);
+  return d;
+}
+
+function fmtDist(m) {
+  if(m<1) return m.toFixed(2)+' m';
+  if(m<1000) return m.toFixed(1)+' m';
+  return (m/1000).toFixed(3)+' km';
+}
+
+function showRulerPanel(mode, total, last) {
+  let rp = document.getElementById('ruler-panel');
+  if(!rp) {
+    const sb=document.getElementById('detail-panel');
+    rp=document.createElement('div'); rp.id='ruler-panel'; rp.className='ruler-panel';
+    sb.insertAdjacentElement('beforebegin',rp);
+  }
+  rp.innerHTML=`
+    <div class="ruler-title">
+      ${mode==='line'?'📏 Ruler Garis':'⭕ Ruler Radius'}
+      <span style="font-size:10px;color:var(--text2)">${mode==='line'?rulerPoints.length+' titik':rulerPoints.length>0?'Klik untuk atur radius':'Klik untuk pusat'}</span>
+    </div>
+    <div class="ruler-val">${fmtDist(total)}</div>
+    <div class="ruler-sub">${mode==='line'&&rulerPoints.length>1?`Segmen terakhir: ${fmtDist(last)} · Total: ${fmtDist(total)}`:mode==='radius'&&total>0?`Radius: ${fmtDist(total)} · Keliling: ${fmtDist(2*Math.PI*total)}`:mode==='line'?'Klik peta untuk mulai mengukur':'Klik peta untuk atur pusat radius'}</div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// SELECTION & EDIT
+// ══════════════════════════════════════════════════════════
+function clearSelection(refresh=true) {
+  const prev=[...selected]; selected.clear();
+  if(refresh) prev.forEach(idx=>refreshMarker(idx));
+  updateStats();
+}
+
+function toggleDeleteMulti(idxs) {
+  const allDel = idxs.every(idx=>state[idx].deleted);
+  history.push({type:'delete',idxs,prev:idxs.map(idx=>state[idx].deleted)});
+  idxs.forEach(idx=>{
+    state[idx].deleted=!allDel;
+    if(!allDel) state[idx].moved=false;
+    refreshMarker(idx);
+  });
+  if(selected.size>0) renderMultiDetail(); else if(activeIdx!==null&&idxs.includes(activeIdx)) renderDetail(activeIdx);
+  updateStats();
 }
 
 function renderDetail(idx) {
-  const p = POINTS.find(p=>p.idx===idx); if(!p) return;
-  const s = state[idx];
-  const moved   = s.moved;
-  const deleted = s.deleted;
-  const fungsiC = p.fungsi==='Arteri'?'badge-arteri':'badge-kolektor';
-  const sisiC   = p.sisi==='Kiri'?'badge-kiri':'badge-kanan';
-  document.getElementById('detail-panel').innerHTML = `
+  const p=POINTS.find(p=>p.idx===idx); if(!p) return;
+  const s=state[idx]; const f=p.fungsi==='Arteri'?'b-art':'b-kol'; const si=p.sisi==='Kiri'?'b-kir':'b-kan';
+  document.getElementById('detail-panel').innerHTML=`
     <div class="d-id">#${idx+1} — Line ${p.line_id}</div>
     <div class="d-meta">Jarak dari awal: ${p.jarak_m} m</div>
     <div class="badge-box">
-      <span class="badge ${fungsiC}">${p.fungsi}</span>
-      <span class="badge ${sisiC}">${p.sisi}</span>
-      ${moved?'<span class="badge badge-moved">Dipindah ✏️</span>':''}
-      ${deleted?'<span class="badge badge-deleted">Dihapus 🗑</span>':''}
+      <span class="badge ${f}">${p.fungsi}</span><span class="badge ${si}">${p.sisi}</span>
+      ${s.moved?'<span class="badge b-mov">Dipindah ✏️</span>':''}
+      ${s.deleted?'<span class="badge b-del">Dihapus 🗑</span>':''}
     </div>
-    ${!deleted
-      ?`<div class="drag-hint">🖱️ Mode Drag: drag titik ini. Mode Select: kotak untuk pilih banyak.</div>`
-      :'<div class="drag-hint" style="color:var(--red);border-color:rgba(249,95,79,.3);">🗑 Titik dihapus. Klik kanan untuk pulihkan.</div>'
-    }
+    <div class="drag-hint">🖱️ Klik+drag untuk geser. Klik kanan untuk hapus/pulihkan.</div>
     <div class="coord-row">
-      <div class="coord-box">
-        <div class="lbl" style="color:var(--accent)">Original</div>
-        <div class="val">${p.lat_orig.toFixed(7)}</div>
-        <div class="val">${p.lng_orig.toFixed(7)}</div>
-      </div>
-      <div class="coord-box">
-        <div class="lbl" style="color:var(--orange)">Sekarang</div>
-        <div class="val" id="cv-lat">${s.lat.toFixed(7)}</div>
-        <div class="val" id="cv-lng">${s.lng.toFixed(7)}</div>
-      </div>
+      <div class="coord-box"><div class="lbl" style="color:var(--accent)">Original</div>
+        <div class="val">${p.lat_orig.toFixed(7)}</div><div class="val">${p.lng_orig.toFixed(7)}</div></div>
+      <div class="coord-box"><div class="lbl" style="color:var(--orange)">Sekarang</div>
+        <div class="val" id="cv-lat">${s.lat.toFixed(7)}</div><div class="val" id="cv-lng">${s.lng.toFixed(7)}</div></div>
     </div>
     <div class="action-row">
-      <button class="btn ${deleted?'btn-primary':'btn-danger'}" style="flex:1;font-size:11px"
-        onclick="toggleDeleteMulti([${idx}])">${deleted?'↩ Pulihkan':'🗑 Hapus'}</button>
-      ${moved?`<button class="btn btn-ghost" style="font-size:11px" onclick="resetPoint(${idx})">Reset</button>`:''}
+      <button class="btn ${s.deleted?'btn-primary':'btn-danger'}" style="flex:1;font-size:11px"
+        onclick="toggleDeleteMulti([${idx}])">${s.deleted?'↩ Pulihkan':'🗑 Hapus'}</button>
+      ${s.moved?`<button class="btn btn-ghost" style="font-size:11px" onclick="resetPoint(${idx})">Reset</button>`:''}
     </div>`;
 }
 
 function renderMultiDetail() {
-  const n = selected.size;
-  if (n===0) { document.getElementById('detail-panel').innerHTML='<div class="empty-state"><div class="ico">🚶</div>Seleksi kosong. Seret kotak atau klik titik untuk memilih.</div>'; return; }
-  const delCount = [...selected].filter(idx=>state[idx].deleted).length;
-  const list = [...selected].slice(0,20).map(idx => {
+  const n=selected.size;
+  if(n===0) { renderEmptyState(); return; }
+  const delCount=[...selected].filter(idx=>state[idx].deleted).length;
+  const list=[...selected].slice(0,15).map(idx=>{
     const p=POINTS.find(p=>p.idx===idx);
     return `<div class="multi-item">#${idx+1} ${p.fungsi} ${p.sisi}${state[idx].deleted?' 🗑':''}</div>`;
   }).join('');
-  document.getElementById('detail-panel').innerHTML = `
+  document.getElementById('detail-panel').innerHTML=`
     <div class="multi-panel">
       <div class="multi-title">${n} titik terpilih</div>
-      <div class="multi-list">${list}${n>20?`<div class="multi-item" style="color:var(--text2)">...+${n-20} lainnya</div>`:''}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-danger" style="flex:1;font-size:11px" onclick="toggleDeleteMulti([...selected])">
-          ${delCount===n?'↩ Pulihkan Semua':'🗑 Hapus Semua'}</button>
-        <button class="btn btn-ghost" style="font-size:11px" onclick="clearSelection(true)">✕ Batal Pilih</button>
+      <div class="multi-list">${list}${n>15?`<div class="multi-item" style="color:var(--text2)">...+${n-15} lainnya</div>`:''}</div>
+      <div style="display:flex;gap:5px;">
+        <button class="btn ${delCount===n?'btn-primary':'btn-danger'}" style="flex:1;font-size:11px"
+          onclick="toggleDeleteMulti([...selected])">${delCount===n?'↩ Pulihkan Semua':'🗑 Hapus Semua'}</button>
+        <button class="btn btn-ghost" style="font-size:11px" onclick="clearSelection(true)">✕</button>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Geser seleksi (meter):</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:4px;">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">
+      <b style="color:var(--accent)">Klik+drag</b> titik terpilih di peta untuk geser.<br>Atau gunakan tombol arah:
+    </div>
+    <div class="arrow-grid">
       <div></div>
-      <button class="btn btn-ghost" style="font-size:11px" onclick="moveSelectionBy(0.00001,0)">▲ N</button>
+      <button class="btn btn-ghost" onclick="nudge(0.00001,0)">▲</button>
       <div></div>
-      <button class="btn btn-ghost" style="font-size:11px" onclick="moveSelectionBy(0,-0.00001)">◀ W</button>
-      <button class="btn btn-ghost" style="font-size:11px;background:var(--surface2)" disabled>+</button>
-      <button class="btn btn-ghost" style="font-size:11px" onclick="moveSelectionBy(0,0.00001)">▶ E</button>
+      <button class="btn btn-ghost" onclick="nudge(0,-0.00001)">◀</button>
+      <button class="btn btn-ghost" style="background:var(--surface2);cursor:default" disabled>·</button>
+      <button class="btn btn-ghost" onclick="nudge(0,0.00001)">▶</button>
       <div></div>
-      <button class="btn btn-ghost" style="font-size:11px" onclick="moveSelectionBy(-0.00001,0)">▼ S</button>
+      <button class="btn btn-ghost" onclick="nudge(-0.00001,0)">▼</button>
       <div></div>
     </div>
-    <div style="font-size:10px;color:var(--text2);margin-top:4px;">≈ 1.1m per klik · atau drag di Mode Drag</div>`;
+    <div style="font-size:10px;color:var(--text2);margin-top:3px;">≈ 1.1m per klik arah</div>`;
 }
 
-function updateCoordBox(lat,lng) {
-  const e1=document.getElementById('cv-lat'), e2=document.getElementById('cv-lng');
-  if(e1) e1.textContent=lat.toFixed(7); if(e2) e2.textContent=lng.toFixed(7);
+function nudge(dLat,dLng) {
+  if(!selected.size) return;
+  const prev=[...selected].map(idx=>{const s=state[idx];return {idx,lat:s.lat,lng:s.lng};});
+  history.push({type:'move',idxs:[...selected],prev});
+  selected.forEach(idx=>{ state[idx].lat+=dLat; state[idx].lng+=dLng; state[idx].moved=true; refreshMarker(idx); });
+  updateStats();
+}
+
+function renderEmptyState() {
+  document.getElementById('detail-panel').innerHTML=`<div class="empty-state"><div class="ico">🚶</div>
+    <b style="color:var(--accent)">Klik kiri</b> = pilih/blok titik<br>
+    <b style="color:var(--accent)">Klik+drag</b> = geser titik terpilih<br>
+    <b style="color:var(--text2)">Klik kanan+drag</b> = pan peta<br>
+    <b style="color:var(--red)">Klik kanan titik</b> = hapus/pulihkan<br><br>
+    <b style="color:var(--cyan)">Ruler:</b> pilih mode di toolbar</div>`;
+}
+
+function updateCoordBoxFromSelected() {
+  if(selected.size===1) {
+    const idx=[...selected][0]; const s=state[idx];
+    const e1=document.getElementById('cv-lat'),e2=document.getElementById('cv-lng');
+    if(e1) e1.textContent=s.lat.toFixed(7); if(e2) e2.textContent=s.lng.toFixed(7);
+  }
 }
 
 function resetPoint(idx) {
   const p=POINTS.find(p=>p.idx===idx); if(!p) return;
   state[idx].lat=p.lat_orig; state[idx].lng=p.lng_orig; state[idx].moved=false;
-  refreshMarker(idx);
-  renderDetail(idx); updateStats();
+  refreshMarker(idx); renderDetail(idx); updateStats();
 }
 
 // ── LIST ──────────────────────────────────────────────────
 function buildList(idxSet) {
-  const pts=POINTS.filter(p=>idxSet.has(p.idx));
-  document.getElementById('list-panel').innerHTML=pts.map(p=>{
+  document.getElementById('list-panel').innerHTML=POINTS.filter(p=>idxSet.has(p.idx)).map(p=>{
     const s=state[p.idx]; const col=ptColor(p);
     const tag=s.deleted?'<span style="color:var(--red);font-size:9px">DEL</span>':s.moved?'<span style="color:var(--orange);font-size:9px">MOV</span>':'';
     const cls=[p.idx===activeIdx?'active':'',selected.has(p.idx)?'selected':''].join(' ');
-    return `<div class="li ${cls}" id="li-${p.idx}" onclick="currentMode==='select'?(selected.has(${p.idx})?selected.delete(${p.idx}):selected.add(${p.idx}),refreshMarker(${p.idx}),renderMultiDetail(),updateStats()):selectPoint(${p.idx})">
+    return `<div class="li ${cls}" id="li-${p.idx}" onclick="toggleSelectOne(${p.idx})">
       <div class="li-dot" style="background:${col};opacity:${s.deleted?.4:1}"></div>
-      <span class="li-id">#${p.idx+1} ${p.fungsi} ${p.sisi}</span>
-      ${tag}
-    </div>`;
+      <span class="li-id">#${p.idx+1} ${p.fungsi} ${p.sisi}</span>${tag}</div>`;
   }).join('');
+}
+
+function toggleSelectOne(idx) {
+  if(selected.has(idx)) { selected.delete(idx); refreshMarker(idx); if(selected.size===0) renderEmptyState(); else renderMultiDetail(); }
+  else { selected.add(idx); refreshMarker(idx); renderMultiDetail(); }
+  const li=document.getElementById('li-'+idx); if(li) li.classList.toggle('selected',selected.has(idx));
+  updateStats();
 }
 
 // ── STATS ─────────────────────────────────────────────────
 function updateStats() {
-  const aktif  =POINTS.filter(p=>!state[p.idx].deleted).length;
-  const del    =POINTS.filter(p=> state[p.idx].deleted).length;
-  const moved  =POINTS.filter(p=> state[p.idx].moved&&!state[p.idx].deleted).length;
-  const changed=del+moved;
+  const aktif =POINTS.filter(p=>!state[p.idx].deleted).length;
+  const del   =POINTS.filter(p=> state[p.idx].deleted).length;
+  const moved =POINTS.filter(p=> state[p.idx].moved&&!state[p.idx].deleted).length;
   document.getElementById('hs-total').textContent  =POINTS.length;
   document.getElementById('hs-aktif').textContent  =aktif;
   document.getElementById('hs-sel').textContent    =selected.size;
@@ -664,9 +731,8 @@ function updateStats() {
   document.getElementById('ep-del').textContent    =del;
   document.getElementById('ep-moved').textContent  =moved;
   document.getElementById('ep-badge').textContent  =aktif+' aktif';
-  const badge=document.getElementById('sb-changed');
-  if(changed>0){badge.style.display='inline';badge.textContent=changed+' perubahan';}
-  else badge.style.display='none';
+  const b=document.getElementById('sb-changed');
+  const n=del+moved; if(n>0){b.style.display='inline';b.textContent=n+' perubahan';} else b.style.display='none';
   document.getElementById('btn-undo').disabled=history.length===0;
 }
 
@@ -674,32 +740,26 @@ function updateStats() {
 function undoLast() {
   if(!history.length) return;
   const h=history.pop();
-  if(h.type==='delete') {
-    h.idxs.forEach((idx,i)=>{ state[idx].deleted=h.prev[i]; refreshMarker(idx); });
-  } else if(h.type==='move') {
-    h.prev.forEach(p=>{ state[p.idx].lat=p.lat; state[p.idx].lng=p.lng; state[p.idx].moved=false; refreshMarker(p.idx); });
-  }
-  if(activeIdx!==null) renderDetail(activeIdx);
-  if(selected.size>0) renderMultiDetail();
-  updateStats();
+  if(h.type==='delete') h.idxs.forEach((idx,i)=>{ state[idx].deleted=h.prev[i]; refreshMarker(idx); });
+  else if(h.type==='move') h.prev.forEach(p=>{ state[p.idx].lat=p.lat; state[p.idx].lng=p.lng; state[p.idx].moved=false; refreshMarker(p.idx); });
+  if(selected.size>0) renderMultiDetail(); updateStats();
 }
 
-// ── FILTER ────────────────────────────────────────────────
+// ── FILTERS ───────────────────────────────────────────────
 function applyFilters() {
   const fungsi=document.getElementById('f-fungsi').value;
   const sisi  =document.getElementById('f-sisi').value;
   const status=document.getElementById('f-status').value;
   filteredIdxs=new Set(POINTS.filter(p=>{
     if(fungsi&&p.fungsi!==fungsi) return false;
-    if(sisi&&p.sisi!==sisi) return false;
+    if(sisi  &&p.sisi  !==sisi)   return false;
     const s=state[p.idx];
     if(status==='aktif'   &&(s.deleted||s.moved))  return false;
     if(status==='moved'   &&(!s.moved||s.deleted))  return false;
     if(status==='deleted' &&!s.deleted)             return false;
     return true;
   }).map(p=>p.idx));
-  clearSelection(false);
-  buildMarkers(filteredIdxs);
+  clearSelection(false); buildMarkers(filteredIdxs);
 }
 document.getElementById('f-fungsi').addEventListener('change',applyFilters);
 document.getElementById('f-sisi').addEventListener('change',applyFilters);
@@ -714,27 +774,28 @@ function doExport(mode) {
       const s=state[p.idx];
       return {type:'Feature',
         geometry:{type:'Point',coordinates:[parseFloat(s.lng.toFixed(8)),parseFloat(s.lat.toFixed(8))]},
-        properties:{
-          idx:p.idx+1,line_id:p.line_id,fungsi_jalan:p.fungsi,sisi:p.sisi,jarak_m:p.jarak_m,
+        properties:{idx:p.idx+1,line_id:p.line_id,fungsi_jalan:p.fungsi,sisi:p.sisi,jarak_m:p.jarak_m,
           lat_original:p.lat_orig,lng_original:p.lng_orig,
           lat_adjusted:parseFloat(s.lat.toFixed(8)),lng_adjusted:parseFloat(s.lng.toFixed(8)),
-          moved:s.moved,deleted:s.deleted,
-          status:s.deleted?'deleted':s.moved?'moved':'original'
+          moved:s.moved,deleted:s.deleted,status:s.deleted?'deleted':s.moved?'moved':'original'
         }
       };
     })
   };
-  const blob=new Blob([JSON.stringify(gj,null,2)],{type:'application/geo+json'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(gj,null,2)],{type:'application/geo+json'}));
   a.download=`pedestrian_tambahan2_${new Date().toISOString().slice(0,10).replace(/-/g,'')}_${mode}.geojson`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
-function toggleExport(){ document.getElementById('ep-body').classList.toggle('open'); }
-function resetView(){ map.fitBounds([[Math.min(...POINTS.map(p=>p.lat)),Math.min(...POINTS.map(p=>p.lng))],[Math.max(...POINTS.map(p=>p.lat)),Math.max(...POINTS.map(p=>p.lng))]],{padding:[30,30]}); }
+function toggleExport(){document.getElementById('ep-body').classList.toggle('open');}
+function resetView(){
+  const lats=POINTS.map(p=>p.lat),lngs=POINTS.map(p=>p.lng);
+  map.fitBounds([[Math.min(...lats),Math.min(...lngs)],[Math.max(...lats),Math.max(...lngs)]],{padding:[30,30]});
+}
 
 // ── INIT ──────────────────────────────────────────────────
+map.dragging.disable(); // kita handle sendiri
 buildMarkers(filteredIdxs);
 resetView();
 </script>
